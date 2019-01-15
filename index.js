@@ -56,7 +56,7 @@ fs.readdir('./commands/staff', (err, files) => {
 
 client.on('ready', async () => {
     setInterval(function () {
-        let randomActivity = [`Server ip: *${botconfig.serverip}*`, "ItsJustJoran", "Lobby plugin connecten..", "Core to scanning..", "Mysql connecten..", `With ${client.commands.size} command(s).`];
+        let randomActivity = [`Server ip: *${botconfig.serverip}*`, "ItsJustJoran", "Lobby plugin connecten..", "Core to scanning..", "Mysql connecten..", `With ${client.commands.size} command(s).`, "Mysql connection succesvol."];
         let activity = randomActivity[Math.floor(Math.random() * randomActivity.length)];
         client.user.setActivity(activity)
     }, [5000]);

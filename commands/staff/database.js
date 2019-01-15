@@ -1,16 +1,16 @@
 const discord = require('discord.js');
 const fs = require('fs');
 
-module.exports.run = async (bot, message, args, randomcolor, prefix, discord, botconfig, mysql, con) => {
+module.exports.run = async (client, message, args, randomcolor, prefix, discord, botconfig, mysql, con) => {
 
-    // if (!message.member.hasPermission('MANAGE_NICKNAMES')) {
-    //     let embed = new discord.RichEmbed()
-    //         .setAuthor('Error ❌')
-    //         .setColor(randomcolor)
-    //         .setDescription(`***Geen permissions.***\n\nPermission: **MANAGE_NICKNAMES**`);
-    //
-    //     return message.channel.send(embed)
-    // }
+    if (!message.member.hasPermission('MANAGE_NICKNAMES')) {
+        let embed = new discord.RichEmbed()
+            .setAuthor('Error ❌')
+            .setColor(randomcolor)
+            .setDescription(`***Geen permissions.***\n\nPermission: **MANAGE_NICKNAMES**`);
+
+        return message.channel.send(embed)
+    }
 
     var user = message.guild.member(message.mentions.users.first());
     var bijnaam = args.join(" ").slice(22);
@@ -37,7 +37,7 @@ module.exports.run = async (bot, message, args, randomcolor, prefix, discord, bo
         let embed = new discord.RichEmbed()
             .setAuthor('Error ❌')
             .setColor(randomcolor)
-            .setDescription(`***Te wijnig argumenten.***\n\nGebruik: **${prefix}data <@user> <bijnaam>**`);
+            .setDescription(`***Te wijnig argumenten.***\n\nGebruik: **${prefix}setusername <@user> <username>**`);
 
         return message.channel.send(embed);
 
@@ -68,7 +68,7 @@ module.exports.run = async (bot, message, args, randomcolor, prefix, discord, bo
             if (rows < 1) {
 
                 con.query(`INSERT INTO data (idUser,bijNaam) values ("${user.id}","${bijnaam}")`);
-                message.channel.send('Bijnaam veranderd!')
+                message.channel.send('Bijnaam veranderd!');
 
             } else {
 
@@ -84,5 +84,5 @@ module.exports.run = async (bot, message, args, randomcolor, prefix, discord, bo
 
 
 module.exports.help = {
-    name: "data"
+    name: "setusername"
 };

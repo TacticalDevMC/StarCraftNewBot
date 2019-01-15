@@ -1,7 +1,7 @@
 const discord = require('discord.js');
 const fs = require('fs');
 
-module.exports.run = async (bot, message, args, randomcolor, prefix, discord, botconfig, mysql, con) => {
+module.exports.run = async (client, message, args, randomcolor, prefix, discord, botconfig, mysql, con) => {
 
 
     if (!message.member.hasPermission('BAN_MEMBERS')) {
