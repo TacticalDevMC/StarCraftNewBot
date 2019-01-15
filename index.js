@@ -4,10 +4,13 @@ const botconfig = require("./botconfig.json");
 const fs = require("fs");
 const chalk = require("chalk");
 const moment = require("moment");
+const database = require('./database.json');
+const mysql = require('mysql');
 
 var prefix = botconfig.prefix;
 
 client.commands = new discord.Collection();
+
 
 fs.readdir('./commands/general', (err, files) => {
 
@@ -30,6 +33,27 @@ fs.readdir('./commands/general', (err, files) => {
     });
 });
 
+fs.readdir('./commands/staff', (err, files) => {
+
+    if (err) console.log(err);
+
+    var jsFiles = files.filter(f => f.split(".").pop() === "js");
+
+    if (jsFiles.length <= 0) {
+        console.log(chalk.blue('[STAFF] ') + chalk.red("Ik kon geen files vinden!"));
+        return;
+    }
+
+    jsFiles.forEach((f, i) => {
+        delete require.cache[require.resolve(`./commands/staff/${f}`)];
+
+        var fileGet = require(`./commands/staff/${f}`);
+        console.log(chalk.blue('[STAFF] ') + chalk.green(`De file ${f} is geladen`));
+
+        client.commands.set(fileGet.help.name, fileGet);
+    });
+});
+
 client.on('ready', async () => {
     setInterval(function () {
         let randomActivity = [`Server ip: *${botconfig.serverip}*`, "ItsJustJoran", "Lobby plugin connecten..", "Core to scanning..", "Mysql connecten..", `With ${client.commands.size} command(s).`];
@@ -44,6 +68,21 @@ client.on('ready', async () => {
 });
 
 client.on('message', async message => {
+
+    var con = mysql.createConnection({
+
+        host: database.host,
+        user: database.user,
+        password: database.password,
+        database: database.database
+
+    });
+
+    con.connect(err => {
+
+        if (err) throw err;
+
+    });
 
 
     var random;
@@ -94,7 +133,34 @@ client.on('message', async message => {
 
     var commands = client.commands.get(cmd.slice(prefix.length));
 
-    if (commands) commands.run(client, message, args, randomcolor, prefix, discord, botconfig);
+    if (commands) commands.run(client, message, args, randomcolor, prefix, discord, botconfig, mysql, con);
+});
+
+
+
+client.on('guildMemberAdd', async member => {
+    var con = mysql.createConnection({
+
+        host: database.host,
+        user: database.user,
+        password: database.password,
+        database: database.database
+
+    });
+
+    con.query(`SELECT * FROM data WHERE idUser = '${member.id}'`, (err, rows) => {
+        if (rows < 1) {
+
+            message.guild.channels.find('name', 'general').send(`Test, data is gezet!!`);
+            con.query(`INSERT INTO data (idUser,bijNaam) values ("${member.id}","Speler | " ${member.username})`)
+
+        } else {
+
+            message.guild.channels.find('name', 'general').send(`Test, data is geupdated!!`);
+            con.query(`UPDATE data SET bijNaam = '${bijnaam}' WHERE idUser = '${member.id}'`);
+
+        }
+    });
 });
 
 
